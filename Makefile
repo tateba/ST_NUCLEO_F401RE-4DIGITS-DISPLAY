@@ -87,7 +87,9 @@ CSRC = $(PORTSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
        main.c \
-       dslib.c
+       dslib.c \
+       tmlib.c \
+       delay.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
