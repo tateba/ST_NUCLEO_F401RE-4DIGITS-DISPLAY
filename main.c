@@ -22,11 +22,34 @@
 
     // Declaration of a structure of calendar
     struct ds1307_t calendar; // We will use the time for 4-digit Display
+    
+    // Data to send to 4-digit Display
+    uint8_t data[4];
 
+    // Double Point state
+    bool dp_flag = true;
 
 //=============================================================================
 // Functions
 //=============================================================================
+
+void showTime (struct ds1307_t clock, bool dp)
+{
+    uint8_t d1, d2, d3, d4;
+
+    d1 = clock.minutes%10;
+    d2 = (clock.minutes - d1)/10;
+    d3 = clock.hours%10;
+    d4 = (clock.hours - d3)/10;
+    data[0] = encodeDigit(d4);
+    if (dp)
+        data[1] = 0x80 | encodeDigit(d3);
+    else
+        data[1] = encodeDigit(d3);
+    data[2] = encodeDigit(d2);
+    data[3] = encodeDigit(d1);
+    setSegments(data, 4, 0);
+}
 
 // RTC reader thread
 static WORKING_AREA ( waRtcReadThread, 128 );
@@ -40,7 +63,7 @@ static msg_t RtcReadThread (void *arg)
     while ( TRUE )
     {
         calendar = getDs1307Date ( &status, &timeOut );
-        chThdSleepMilliseconds( 800 );
+        chThdSleepMilliseconds( 1000 );
     }
     return 0;
 }
@@ -54,6 +77,15 @@ static msg_t RtcPrintThread (void *arg)
     while ( TRUE )
     {
         ds1307Print ( calendar );
+        dp_flag ^=1;
+        showTime(calendar, dp_flag);
+        //showNumberDec (calendar.seconds%10, false, 4, 0);
+        //showNumberDec (calendar.minutes, false, 4, 0);
+        //showNumberDec (calendar.hours, false, 4, 0);
+        //showNumberDec (calendar.day, false, 4, 0);
+        //showNumberDec (calendar.date, false, 4, 0);
+        //showNumberDec (calendar.month, false, 4, 0);
+        //showNumberDec (calendar.year, false, 4, 0); // TODO: Print this data on the display  
         chThdSleepMilliseconds ( 1000 );
     }
     return 0;
@@ -65,8 +97,6 @@ static msg_t RtcPrintThread (void *arg)
 */
 int main (void) 
 {
-    uint16_t i, j;
-
     // System initializations.
     halInit ();
     chSysInit ();
@@ -96,35 +126,15 @@ int main (void)
     //setDs1307Date( &status, &tmo, calendar);
 
     // Create the thread used to read the RTC DS1307
-    chThdCreateStatic(waRtcReadThread, sizeof(waRtcReadThread), NORMALPRIO, 
+    chThdCreateStatic(waRtcReadThread, sizeof(waRtcReadThread), NORMALPRIO+1, 
     RtcReadThread, NULL);
     
     // Create the thread used to print the RTC data every seconds
     chThdCreateStatic(waRtcPrintThread, sizeof(waRtcPrintThread), NORMALPRIO, 
     RtcPrintThread, NULL);
-    
-    uint8_t data[] = { 0xFF, 0xFF, 0xFF, 0xFF};
-    data[0] = encodeDigit(1);
-    data[1] = encodeDigit(2);
-    data[2] = encodeDigit(3);
-    data[3] = encodeDigit(15);
-    
+  
+    // Set the display intensity before sending data to print.
     setBrightness(0x0F);
-
-    setSegments (data, 4, 0);
-    chThdSleepMilliseconds(3000);
-
-    bool lz = false;
-    for (j = 0; j < 2; j++)
-    {
-        for (i = 0; i < 1000; i++)
-        {
-            showNumberDec(i, lz, 4, 0);
-            chThdSleepMilliseconds(1000);
-        }
-
-        lz = true;
-    }
 
     while (1)
     {
