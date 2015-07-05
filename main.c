@@ -1,9 +1,9 @@
 /*
 * @file     main.c 
-* @brief    Control a 4-Digit Display by I2C
+* @brief    Control a 4-Digit Display by software like I2C by using DIO
 * @author   Theodore ATEBA
 * @version  1.0
-* @date 21  June 2015
+* @date 04  July 2015
 */
 
 //=============================================================================
@@ -21,7 +21,7 @@
 //=============================================================================
 
     // Declaration of a structure of calendar
-    struct ds1307_t calendar;
+    struct ds1307_t calendar; // We will use the time for 4-digit Display
 
 
 //=============================================================================
@@ -60,23 +60,6 @@ static msg_t RtcPrintThread (void *arg)
 }
 
 /*
-// GPIOC_PIN8 Toggle 50us Thread
-static WORKING_AREA (waToggleThread, 128);
-static msg_t ToggleThread (void *arg)
-{
-    (void)arg;
-    chRegSetThreadName ("GPIOC_PIN8 commuter");
-    while(TRUE)
-    {
-        palTogglePad (GPIOC, DIO_PIN);
-        //bitDelay ();
-        usDelay(1);
-    }
-    return 0;
-}
-*/
-
-/*
 * @fn       int main (void)
 * @brief    Application entry point.
 */
@@ -91,8 +74,7 @@ int main (void)
     // Init the I2C interface 1
     ds1307InterfaceInit ();
         
-    // init the serial Driver
-    //serialDriver2Init ();
+    // init the serial Driver 2 to print at the same time the date.
      sdStart(&SD2, NULL);
     
     // Set the GPIOs pin used
@@ -120,10 +102,6 @@ int main (void)
     // Create the thread used to print the RTC data every seconds
     chThdCreateStatic(waRtcPrintThread, sizeof(waRtcPrintThread), NORMALPRIO, 
     RtcPrintThread, NULL);
-
-    // Create toggle thread
-    //chThdCreateStatic(waToggleThread, sizeof(waToggleThread), NORMALPRIO+3, 
-    //ToggleThread, NULL);
     
     uint8_t data[] = { 0xFF, 0xFF, 0xFF, 0xFF};
     data[0] = encodeDigit(1);

@@ -40,8 +40,8 @@ const uint8_t digitToSegments[] = {
 //=============================================================================
 
 /*
- * @fn void bitDelay(void)
- * @brief Width of a bit on DIO bus
+ * @fn      void bitDelay (void)
+ * @brief   Width of a bit on DIO bus
  */
 void bitDelay (void)
 {
@@ -49,8 +49,8 @@ void bitDelay (void)
 }
 
 /*
- * @fn void start (void)
- * @brief Generation of the start condition on the DIO bus.
+ * @fn      void start (void)
+ * @brief   Generation of the start condition on the DIO bus.
  */
 void start (void)
 {
@@ -59,8 +59,8 @@ void start (void)
 }
 
 /*
- * @fnn void stop (void)
- * @brief Generation of the stop condition on the DIO bus.
+ * @fnn     void stop (void)
+ * @brief   Generation of the stop condition on the DIO bus.
  */
 void stop (void)
 {
@@ -73,9 +73,9 @@ void stop (void)
 }
 
 /*
- * @fn uint8_t encodeDigit(uint8_t digit)
- * @brief Encode the data to print on the 4-digit Display
- * @param[in] digit the data to convert for the Display
+ * @fn          uint8_t encodeDigit (uint8_t digit)
+ * @brief       Encode the data to print on the 4-digit Display
+ * @param[in]   digit the data to convert for the Display
  */
 uint8_t encodeDigit(uint8_t digit)
 {
@@ -83,11 +83,11 @@ uint8_t encodeDigit(uint8_t digit)
 }
 
 /*
- * @fn void digitBrightness(uint8_t brightness)
- * @brief set the brightness of the 4-Digit Display.
- * @note 0 is the dimmest and 255 is the brightest
- * @note set before calling four_digit_display
- * @param[in] brightness The level of the brightness we want to set
+ * @fn          void digitBrightness (uint8_t brightness)
+ * @brief       set the brightness of the 4-Digit Display.
+ * @note        0 is the dimmest and 255 is the brightest
+ * @note        set before calling four_digit_display
+ * @param[in]   brightness The level of the brightness we want to set
  */
 void setBrightness (uint8_t  bright)
 {
@@ -95,9 +95,9 @@ void setBrightness (uint8_t  bright)
 }
     
 /*
- * @fn bool writeByte(uint8_t byte)
- * @brief write a byte to the GPIO pin used as DIO
- * @param[in] byte Data to write on the DIO pin
+ * @fn          bool writeByte (uint8_t byte)
+ * @brief       write a byte to the GPIO pin used as DIO
+ * @param[in]   byte Data to write on the DIO pin
  */
 bool writeByte(uint8_t byte)
 {
@@ -148,11 +148,11 @@ bool writeByte(uint8_t byte)
 //void four_digit_clear (void)
 
 /*
- * @fn void setSegments (const uint8_t segments[], uint8_t length, uint8_t pos)
- * @brief print the data on the segments
- * @param[in] segments array of data to print on the 4-digit Display
- * @param[in] length Size of the array of data to print
- * @param[in] pos Position of the first digit to update
+ * @fn          void setSegments (const uint8_t segments[], uint8_t length, uint8_t pos)
+ * @brief       print the data on the segments
+ * @param[in]   segments array of data to print on the 4-digit Display
+ * @param[in]   length Size of the array of data to print
+ * @param[in]   pos Position of the first digit to update
  */
 void setSegments (const uint8_t segments[], uint8_t length, uint8_t pos)
 {
@@ -179,12 +179,12 @@ void setSegments (const uint8_t segments[], uint8_t length, uint8_t pos)
 }
 
 /*
- * @fn void showNumberDec(uint16_t num, bool leading_zero, uint8_t length, uint8_t pos)
- * @brief Print Decimal number on the 4-Digit Display
- * @param[in] num number to print
- * @param[in] leading_zero 
- * @param[in] length
- * @param[in] pos position of the digit
+ * @fn          void showNumberDec (uint16_t num, bool leading_zero, uint8_t length, uint8_t pos)
+ * @brief       Print Decimal number on the 4-Digit Display
+ * @param[in]   num number to print
+ * @param[in]   leading_zero 
+ * @param[in]   length
+ * @param[in]   pos position of the digit
  */
 void showNumberDec(uint16_t num, bool leading_zero, uint8_t length, uint8_t pos)
 {
