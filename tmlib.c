@@ -77,7 +77,7 @@ void stop (void)
  * @brief       Encode the data to print on the 4-digit Display
  * @param[in]   digit the data to convert for the Display
  */
-uint8_t encodeDigit(uint8_t digit)
+uint8_t encodeDigit (uint8_t digit)
 {
     return digitToSegments [digit & 0x0F];
 }
@@ -213,4 +213,67 @@ void showNumberDec(uint16_t num, bool leading_zero, uint8_t length, uint8_t pos)
     }
 
     setSegments (digits + (4 - length), length, pos);
+}
+
+/*
+ * @fn          void showTime (struc ds1307_t clock, bool dp, uint8_t msg)
+ * @brief       Convert and print data on 4Digit-Display
+ * @param[in]   clock data date structure.
+ * @param[in]   dp flag of double point for clock
+ */
+void showTime (struct ds1307_t clock, bool dp, uint8_t msg)
+{
+    uint8_t d1, d2, d3, d4, data[4];
+
+    switch (msg)
+    {
+        case 0:
+            d1 = clock.seconds%10;
+            d2 = (clock.seconds - d1)/10;
+            d3 = clock.minutes%10;
+            d4 = (clock.minutes - d3)/10;
+            data[0] = encodeDigit (d4);
+            if (dp)
+                data[1] = 0x80 | encodeDigit (d3);
+            else
+                data[1] = encodeDigit (d3);
+            data[2] = encodeDigit (d2);
+            data[3] = encodeDigit (d1);
+            setSegments(data, 4, 0);
+        break;
+
+        case 1:
+            d1 = clock.minutes%10;
+            d2 = (clock.minutes - d1)/10;
+            d3 = clock.hours%10;
+            d4 = (clock.hours - d3)/10;
+            data[0] = encodeDigit (d4);
+            if (dp)
+                data[1] = 0x80 | encodeDigit (d3);
+            else
+                data[1] = encodeDigit(d3);
+            data[2] = encodeDigit(d2);
+            data[3] = encodeDigit(d1);
+            setSegments(data, 4, 0);
+        break;
+
+        case 2:
+            showNumberDec (clock.day, false, 4, 0);
+        break;
+
+        case 3:
+            showNumberDec (clock.date, false, 4, 0);
+        break;
+
+        case 4:
+            showNumberDec (clock.month, false, 4, 0);
+        break;
+
+        case 5:
+            showNumberDec (clock.year, false, 4, 0);
+        break;
+
+        default:
+        break;
+    }
 }

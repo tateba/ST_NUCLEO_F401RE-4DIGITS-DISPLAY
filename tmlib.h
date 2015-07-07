@@ -16,6 +16,7 @@
     #include "ch.h"
     #include "hal.h"
     #include "delay.h"
+    #include "dslib.h"
 
 //=============================================================================
 // Global variables, I2C TX and RX buffers, I2C and Serial Configurations
@@ -113,5 +114,13 @@ void setSegments (const uint8_t segments[], uint8_t length, uint8_t pos);
  * @param[in]   pos position of the digit
  */
 void showNumberDec(uint16_t num, bool leading_zero, uint8_t length, uint8_t pos);
+
+/*
+ * @fn          void showTime (struc ds1307_t clock, bool dp, uint8_t msg)
+ * @brief       Convert and print data on 4Digit-Display
+ * @param[in]   clock data date structure.
+ * @param[in]   dp flag of double point for clock
+ */
+void showTime (struct ds1307_t clock, bool dp, uint8_t msg);
 
 #endif // _TM1637_H_
