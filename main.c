@@ -75,6 +75,45 @@ static msg_t RtcPrintThread (void *arg)
     return 0;
 }
 
+// Trigger the User Button
+static void extcb(EXTDriver *extp, expchannel_t channel)
+{
+    (void)extp;
+    (void)channel;
+
+    data2Print++;
+    if(data2Print == 6)
+        data2Print = 0;
+}
+
+static const EXTConfig extConfig = {
+    {
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_RISING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, extcb},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+        {EXT_CH_MODE_DISABLED, NULL},
+    }
+};
+
 /*
 * @fn       int main (void)
 * @brief    Application entry point.
@@ -96,9 +135,11 @@ int main (void)
     palClearPad (GPIOC, DIO_PIN);
     palSetPadMode (GPIOC, CLK_PIN, PAL_MODE_INPUT_PULLUP);
     palClearPad (GPIOC, CLK_PIN);
-    
-    print ("\n\r Chibios Real Time Clock calendar with 
-    Nucleo and DS1307 printing also on 4Digit Display.\n\r");
+
+    // Activates the Button Interruption
+    extStart(&EXTD1, &extConfig);
+
+    print ("\n\r Chibios Real Time Clock calendar with Nucleo and DS1307 printing also on 4Digit Display.\n\r");
     
     // Used when you whant to set the calendar and clock
     calendar.seconds    = 0;
@@ -123,12 +164,6 @@ int main (void)
 
     while (1)
     {
-        if (!palReadPad(GPIOC, GPIOC_BUTTON))
-        {
-            data2Print++;
-            if (data2Print == 6)
-                data2Print = 0;
-        }
         chThdSleepMilliseconds (500);
     }
 }
