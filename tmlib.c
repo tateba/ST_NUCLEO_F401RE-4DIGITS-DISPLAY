@@ -194,7 +194,7 @@ void showNumberDec(uint16_t num, bool leading_zero, uint8_t length, uint8_t pos)
 
     for(i = 0; i < 4; i++)
     {
-        uint8_t divisor = divisors[4 - 1 - i];
+        uint8_t divisor = divisors[3 - i];
         uint8_t d = num / divisor;
 
         if( d == 0)
@@ -224,6 +224,7 @@ void showNumberDec(uint16_t num, bool leading_zero, uint8_t length, uint8_t pos)
 void showTime (struct ds1307_t clock, bool dp, uint8_t msg)
 {
     uint8_t d1, d2, d3, d4, data[4];
+    uint16_t year, divisor[4] = {1000, 100, 10, 1};
 
     switch (msg)
     {
@@ -270,7 +271,22 @@ void showTime (struct ds1307_t clock, bool dp, uint8_t msg)
         break;
 
         case 5:
-            showNumberDec (clock.year, false, 4, 0);
+            year = clock.year;
+            
+            for(d1 = 0; d1 < 4; d1++)
+            {
+                data[d1] = year/divisor[d1];
+                
+                if(data[d1])
+                    year -= (data[d1] * divisor[d1]);
+                else
+                    data[d1] = 0;
+                showNumberDec (data[d1], true, 1, d1);
+            }
+            //showNumberDec (data[3], true, 1, 3);
+            //showNumberDec (data[2], true, 1, 2);
+            //showNumberDec (data[1], true, 1, 1);
+            //showNumberDec (data[0], true, 1, 0);
         break;
 
         default:

@@ -27,7 +27,7 @@
     struct ds1307_t calendar; // We will use the time for 4-digit Display
 
     // Double Point state
-    bool dp_flag = true;
+    bool dp_flag = false;
 
     // Data to print on the 4-Digit Display
     // 0 ==> minutes:secondes
@@ -67,9 +67,9 @@ static msg_t RtcPrintThread (void *arg)
     chRegSetThreadName ("RTC printer");
     while (TRUE)
     {
-        ds1307Print (calendar);
+        ds1307Print (calendar); // Print RTC data on the console.
         dp_flag ^=1;
-        showTime (calendar, dp_flag, data2Print);
+        showTime (calendar, dp_flag, data2Print); // Pirnt RTC data on the 4-Digit display
         chThdSleepMilliseconds (1000);
     }
     return 0;
@@ -164,6 +164,6 @@ int main (void)
 
     while (1)
     {
-        chThdSleepMilliseconds (500);
+       // chThdSleepMilliseconds (500);
     }
 }
