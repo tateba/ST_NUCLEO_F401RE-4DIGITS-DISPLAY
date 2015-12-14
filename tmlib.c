@@ -45,7 +45,7 @@ const uint8_t digitToSegments[] = {
  */
 void bitDelay (void)
 {
-    usDelay (50);
+    chThdSleepMicroseconds (50);
 }
 
 /*
@@ -283,10 +283,6 @@ void showTime (struct ds1307_t clock, bool dp, uint8_t msg)
                     data[d1] = 0;
                 showNumberDec (data[d1], true, 1, d1);
             }
-            //showNumberDec (data[3], true, 1, 3);
-            //showNumberDec (data[2], true, 1, 2);
-            //showNumberDec (data[1], true, 1, 1);
-            //showNumberDec (data[0], true, 1, 0);
         break;
 
         default:

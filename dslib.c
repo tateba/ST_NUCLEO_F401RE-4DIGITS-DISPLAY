@@ -10,19 +10,17 @@
 //=============================================================================
 // Include Files
 //=============================================================================
-    #include "dslib.h"
+  #include "dslib.h"
+
+extern BaseSequentialStream* pc;
 
 //=============================================================================
 // Global variables, I2C TX and RX buffers, I2C and Serial Configurations
 //=============================================================================
 
-    static uint8_t rxbuf[DS1307_RX_DEPTH];
-    static uint8_t txbuf[DS1307_TX_DEPTH];
-
-    static i2cflags_t errors = 0;
-
-    // Serial Driver configuration
-    static SerialConfig serialDriverConfig;
+  static uint8_t rxbuf[DS1307_RX_DEPTH];
+  static uint8_t txbuf[DS1307_TX_DEPTH];
+  static i2cflags_t errors = 0;
 
     // I2C interface #1
     static const I2CConfig i2cConf = {
@@ -60,38 +58,6 @@ uint8_t dec2Bcd (uint8_t val)
 }
 
 /*
- * @fn           static void print (char *p)
- * @brief        Send data to the Serial Driver 2
- * @param[in]    p pointer of data to print
- */
-void print (char *p)
-{
-    while (*p)
-        sdPut (&SD2, *p++);
-}
-
-/*
- * @fn        static void printn (int16_t number)
- * @brief     Function used to print integer with Serial Driver 2
- * @param[in] number integer to print
- */
-void printn (int16_t number)
-{
-    char buf[16], *p;
-
-    if ( !number )
-        sdPut ( &SD2, '0' );
-    else
-    {
-        p = buf;
-        while ( number )
-            *p++ = ( number % 10 ) + '0', number /= 10;
-        while ( p > buf )
-            sdPut ( &SD2, *--p );
-    }
-}
-
-/*
  * @fn       void ds1307InterfaceInit (void)
  * @brief    Configure the I2C Interface 1 and start the Interface
  */
@@ -105,28 +71,14 @@ void ds1307InterfaceInit (void)
 }
 
 /*
- * @fn       void serialDriver2Init (void)
- * @brief    Serial Driver Initialisation and start the interface
- */
-void serialDriver2Init (void)
-{
-    // Configure the Baud Rate of the serial driver at 115200
-    serialDriverConfig.speed = 115200;
-
-    // Activate the Serial Driver 2
-    sdStart (&SD2, &serialDriverConfig);
-}
-
-/*
- * @fn          void setDs1307Date (msg_t *status, systime_t *tmo,
-                                    struct ds1307_t dsData)
+ * @fn          void ds1307SetDate (struct ds1307_t dsData)
  * @brief       Set the clock and the calendar of the RTC
- * @param[in]   status context
- * @param[in]   tmo time out
  * @param[in]   dsData data used to set Clock and Calendar
  */
-void setDs1307Date (msg_t *status, systime_t *tmo, struct ds1307_t dsData)
+void ds1307SetDate (struct ds1307_t dsData)
 {
+    msg_t status;
+    
     txbuf[0] = DS1307_SECONDS_REG;
     txbuf[1] = dec2Bcd (dsData.seconds);
     txbuf[2] = dec2Bcd (dsData.minutes);
@@ -137,14 +89,14 @@ void setDs1307Date (msg_t *status, systime_t *tmo, struct ds1307_t dsData)
     txbuf[7] = dec2Bcd (dsData.year - 2000);
 
     i2cAcquireBus (&I2CD1);
-    *status = i2cMasterTransmitTimeout (&I2CD1, DS1307_ADDRESS, txbuf, 
-                DS1307_TX_DEPTH, rxbuf, 0, *tmo);
+    status = i2cMasterTransmitTimeout (&I2CD1, DS1307_ADDRESS, txbuf, 
+                DS1307_TX_DEPTH, NULL, 0, MS2ST(10));
     i2cReleaseBus (&I2CD1);
 
-    if (*status != RDY_OK)
-        print ("\n\r Error when setting the DS1307 date over the I2C bus.");
-    else
-        print ("\n\r DS1307 was setting succefuly.");
+    if (status != MSG_OK)
+        chprintf (pc, "\n\r Error when setting the DS1307 date over the I2C bus.");
+    //else
+    //    chprintf (pc, "\n\r DS1307 was setting succefuly.");
 }
 
 /*
@@ -154,42 +106,30 @@ void setDs1307Date (msg_t *status, systime_t *tmo, struct ds1307_t dsData)
  */
 void ds1307Print (struct ds1307_t dsData)
 {
-    print ("\n\r");
-    printn (dsData.date); // The year reference is 2OOO for me :-)
-    print ("/");
-    printn (dsData.month);
-    print("/");
-    printn (dsData.year);
-    print (" ");
-
-    printn (dsData.hours);
-    print (":");
-    printn (dsData.minutes);
-    print (":");
-    printn (dsData.seconds);
+  chprintf (pc, "\n\r RTC: The Date is %d/%d/%d %d:%d:%d", dsData.date, 
+      dsData.month, dsData.year, dsData.hours, dsData.minutes, dsData.seconds);
 }
 
 /*
- * @fn           struct ds1307_t getDs1307Date (msg_t *status,
-                                                        systime_t *tmo)
+ * @fn           struct ds1307_t ds1307GetDate (void)
  * @brief        Get Clock and Calendar
- * @param[in]    *status
- * @param[in]    *tmo
  */
-struct ds1307_t getDs1307Date (msg_t *status, systime_t *tmo)
+struct ds1307_t ds1307GetDate (void)
 {
     struct ds1307_t dsData;
 
+    msg_t status;
+
     txbuf[0] = DS1307_SECONDS_REG; // Register address of the Seconds
     i2cAcquireBus(&I2CD1);
-    *status = i2cMasterTransmitTimeout (&I2CD1, DS1307_ADDRESS, txbuf, 1, 
-                rxbuf, 7, *tmo);
+    status = i2cMasterTransmitTimeout (&I2CD1, DS1307_ADDRESS, txbuf, 1, 
+                rxbuf, 7, MS2ST(10));
     i2cReleaseBus (&I2CD1);
 
-    if (*status != RDY_OK)
+    if (status != MSG_OK)
     {
         errors = i2cGetErrors (&I2CD1);
-        print("\n\r I2C transmission error!");
+        chprintf(pc, "\n\r I2C transmission error!");
     }
     else
     {    

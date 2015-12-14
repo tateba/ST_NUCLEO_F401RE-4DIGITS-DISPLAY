@@ -16,6 +16,7 @@
     #include "ch.h"
     #include "hal.h"
     #include <stdlib.h>
+    #include "chprintf.h"
 
 //=============================================================================
 // Global variables, I2C TX and RX buffers, I2C and Serial Configurations
@@ -57,41 +58,19 @@ uint8_t bcd2Dec (uint8_t val);
  * @return       res Converted value
  */
 uint8_t dec2Bcd (uint8_t val);
-
-/*
- * @fn           void print (char *p)
- * @brief        Send data to the Serial Driver 2
- * @param[in]    p pointer of data to print
- */
-void print (char *p);
-
-/*
- *@fn        void printn (int16_t number)
- *@brief     Function used to print integer with Serial Driver 2
- *@param[in] number integer to print
- */
-void printn (int16_t number);
-
-/*
+ 
+ /*
  * @fn       void ds1307InterfaceInit (void)
  * @brief   Configure the I2C Interface 1 and start the Interface
  */
 void ds1307InterfaceInit (void);
 
 /*
- * @fn       void serialDriver2Init (void)
- * @brief    Serial Driver Initialisation and start the interface
- */
-void serialDriver2Init (void);
-
-/*
- * @fn          void setDs1307Date (msg_t *status, systime_t *tmo, struct ds1307_t dsData);
+ * @fn          void ds1307SetDate (struct ds1307_t dsData);
  * @brief       Set the clock and the calendar of the RTC
- * @param[in]   status context
- * @param[in]   tmo time out
  * @param[in]   dsData data used to set Clock and Calendar
  */
-void setDs1307Date (msg_t *status, systime_t *tmo, struct ds1307_t dsData);
+void ds1307SetDate (struct ds1307_t dsData);
 
 /*
  * @fn           void ds1307Print (struct ds1307_t dsData)
@@ -101,12 +80,9 @@ void setDs1307Date (msg_t *status, systime_t *tmo, struct ds1307_t dsData);
 void ds1307Print (struct ds1307_t dsData);
 
 /*
- * @fn           struct ds1307_t getDs1307Date (msg_t *status,
-                                                        systime_t *tmo)
+ * @fn           struct ds1307_t ds1307GetDate (void)
  * @brief        Get Clock and Calendar
- * @param[in]    status context
- * @param[in]    tmo time out
  */
-struct ds1307_t getDs1307Date (msg_t *status, systime_t *tmo);
+struct ds1307_t ds1307GetDate (void);
 
 #endif // _DSLIB_H_
