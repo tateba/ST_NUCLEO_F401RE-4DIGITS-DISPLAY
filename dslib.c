@@ -34,7 +34,7 @@ static const I2CConfig i2cConf = {
 //=============================================================================
 
 /*
- * @fn          uint8_t bcd2Dec
+ * @fn          bcd2Dec
  * @brief       Convert BCD to Decimal
  * @param[in]   val value to convert from BCD to Decimal
  * @return      res Converted value
