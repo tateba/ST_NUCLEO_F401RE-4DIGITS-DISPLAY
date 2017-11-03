@@ -86,7 +86,10 @@ endif
 PROJECT = ch
 
 # Imported source files and paths
-CHIBIOS = ../../ChibiOS_3.0.3
+CHIBIOS = ../../../ChibiOS_3.0.3
+# Imported drivers paths
+DRIVERS = ../../../drivers
+
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.mk
 # HAL-OSAL files (optional).
@@ -98,26 +101,27 @@ include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/rt/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 # Other files (optional).
-#include $(CHIBIOS)/test/rt/test.mk
+include $(DRIVERS)/ds1307/ds1307.mk
+include $(DRIVERS)/iic/iic.mk
 
 # Define linker script file here
 LDSCRIPT= $(STARTUPLD)/STM32F401xE.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = $(STARTUPSRC) \
-       $(KERNSRC) \
-       $(PORTSRC) \
-       $(OSALSRC) \
-       $(HALSRC) \
-       $(PLATFORMSRC) \
-       $(BOARDSRC) \
-       $(TESTSRC) \
-       $(CHIBIOS)/os/hal/lib/streams/memstreams.c \
-       $(CHIBIOS)/os/hal/lib//streams/chprintf.c \
-       main.c \
-       tmlib.c \
-       dslib.c
+CSRC = $(STARTUPSRC)                               \
+       $(KERNSRC)                                  \
+       $(PORTSRC)                                  \
+       $(OSALSRC)                                  \
+       $(HALSRC)                                   \
+       $(PLATFORMSRC)                              \
+       $(BOARDSRC)                                 \
+       $(TESTSRC)                                  \
+       $(CHIBIOS)/os/hal/lib/streams/memstreams.c  \
+       $(CHIBIOS)/os/hal/lib//streams/chprintf.c   \
+       $(IICSRC)                                   \
+       $(DS1307SRC)                                \
+       main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -146,10 +150,10 @@ TCPPSRC =
 # List ASM source files here
 ASMSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
-INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
-         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
-	 $(CHIBIOS)/os/hal/lib/streams/ \
-         $(CHIBIOS)/os/various
+INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC)   \
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC)  \
+         $(CHIBIOS)/os/hal/lib/streams/                   \
+         $(CHIBIOS)/os/various $(DS1307INC) $(IICINC)
 
 #
 # Project, sources and paths
